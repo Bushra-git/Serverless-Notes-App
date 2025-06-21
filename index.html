@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📒 My Notes App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #4a90e2;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+color: #333;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #357abd;
+    }
+
+    .note {
+      background: #f9f9f9;
+      padding: 12px;
+
+ margin-bottom: 12px;
+      border-left: 5px solid #4a90e2;
+      border-radius: 6px;
+    }
+
+    .note h4 {
+      margin: 0 0 6px 0;
+      color: #333;
+    }
+
+    .note p {
+      margin: 0;
+      color: #555;
+    }
+
+    .note-list {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📒 Serverless Notes App</h1>
+    <p>Made with ❤️ using Flask + Firebase + Cloud Run</p>
+  </header>
+
+  <div class="container">
+    <h2>Add a Note</h2>
+    <input type="text" id="title" placeholder="Note Title" />
+    <textarea id="content" rows="4" placeholder="Note Content"></textarea>
+<button onclick="addNote()">Add Note</button>
+
+    <div class="note-list" id="notes"></div>
+  </div>
+
+  <script>
+   const apiBase = "https://notes-api-923566300079.us-central1.run.app";
+
+
+    async function loadNotes() {
+      const res = await fetch(`${apiBase}/notes`);
+      const notes = await res.json();
+      const notesDiv = document.getElementById("notes");
+
+      if (notes.length === 0) {
+        notesDiv.innerHTML = "<p>No notes yet. Add one!</p>";
+      } else {
+        notesDiv.innerHTML = notes.map(note => `
+          <div class="note">
+            <h4>${note.title}</h4>
+            <p>${note.content}</p>
+          </div>
+        `).join("");
+      }
+    }
+
+    async function addNote() {
+      const title = document.getElementById("title").value.trim();
+      const content = document.getElementById("content").value.trim();
+if (!title || !content) {
+        alert("Please fill both fields!");
+        return;
+      }
+
+      await fetch(`${apiBase}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content })
+      });
+
+      document.getElementById("title").value = "";
+      document.getElementById("content").value = "";
+      loadNotes();
+    }
+
+    // Load notes on page load
+    loadNotes();
+  </script>
+</body>
+</html>
